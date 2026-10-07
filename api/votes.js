@@ -16,16 +16,26 @@ async function listAll(prefix) {
   return out;
 }
 
+// guests: una entrada por votante (sin exponer su id), numeradas por orden del primer voto
 async function snapshot(voter) {
   const counts = Array(DRINKS).fill(0);
   const mine = [];
+  const byVoter = new Map();
   for (const b of await listAll("votes/")) {
     const m = b.pathname.match(/^votes\/(.+)__(\d+)$/);
     if (!m || +m[2] >= DRINKS) continue;
-    counts[+m[2]]++;
-    if (m[1] === voter) mine.push(+m[2]);
+    const d = +m[2];
+    counts[d]++;
+    if (m[1] === voter) mine.push(d);
+    const g = byVoter.get(m[1]) || { t: Infinity, drinks: [], me: m[1] === voter };
+    g.t = Math.min(g.t, new Date(b.uploadedAt).getTime());
+    g.drinks.push(d);
+    byVoter.set(m[1], g);
   }
-  return { counts, mine };
+  const guests = [...byVoter.values()]
+    .sort((x, y) => x.t - y.t)
+    .map((g) => ({ drinks: g.drinks.sort((x, y) => x - y), me: g.me }));
+  return { counts, mine, guests };
 }
 
 module.exports = async (req, res) => {
