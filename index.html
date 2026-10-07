@@ -125,14 +125,14 @@
 <body>
 <header>
   <h1>Carta de tragos</h1>
-  <p>Mirá cómo se arma cada uno, paso por paso. <b>Elegí tu trago</b> y entre todos armamos la compra.</p>
+  <p>Mirá cómo se arma cada uno, paso por paso. <b>Elegí los tragos que quieras</b> y entre todos armamos la compra.</p>
   <p id="status" role="status"></p>
   <button class="print-btn no-print" onclick="window.print()">Guardar como PDF</button>
 </header>
 
 <section class="shop" aria-label="Lista de compras">
   <h2>Lista de compras</h2>
-  <p id="shopNote">Elegí tu trago y la lista se arma sola con lo que hace falta.</p>
+  <p id="shopNote">Elegí tus tragos y la lista se arma sola con lo que hace falta.</p>
   <div class="cols" id="shop"></div>
 </section>
 
@@ -332,22 +332,24 @@ const voter = (()=>{
   if(!id){ id = crypto.randomUUID(); try{ localStorage.setItem("voter", id); }catch(e){} }
   return id;
 })();
-let state = {counts:T.map(()=>0), mine:null};
+let state = {counts:T.map(()=>0), mine:[]};
+let pending = 0; // votos en vuelo: mientras haya, no pisar lo que se ve con respuestas viejas
 const checked = new Set();
 
 function paint(){
   cards.forEach((c,i)=>{
     const n = state.counts[i];
-    c.classList.toggle("mine", state.mine===i);
+    const on = state.mine.includes(i);
+    c.classList.toggle("mine", on);
     const b = c.querySelector(".vbtn");
-    b.setAttribute("aria-pressed", state.mine===i);
-    b.textContent = state.mine===i ? "Elegido ✓" : "Quiero este";
+    b.setAttribute("aria-pressed", on);
+    b.textContent = on ? "Elegido ✓" : "Quiero este";
     c.querySelector(".vcount").innerHTML = `${n} <small>${n===1?"voto":"votos"}</small>`;
   });
   const total = state.counts.reduce((a,b)=>a+b,0);
   document.getElementById("shopNote").textContent = total
     ? `Armada con ${total} ${total===1?"voto":"votos"}. Tocá cada cosa para tacharla.`
-    : "Elegí tu trago y la lista se arma sola con lo que hace falta.";
+    : "Elegí tus tragos y la lista se arma sola con lo que hace falta.";
   document.getElementById("shop").innerHTML = SHOP.map(g=>{
     const rows = g.items.map(([k,label,qty])=>{
       const by = T.map((t,i)=>needs[i].has(k)&&state.counts[i]?`${t.n} ×${state.counts[i]}`:null).filter(Boolean);
@@ -370,19 +372,17 @@ async function api(method, body){
   return r.json();
 }
 async function refresh(){
-  try{ state = await api("GET"); status(""); paint(); }
+  try{ const r = await api("GET"); if(!pending){ state = r; paint(); } status(""); }
   catch(e){ status("No se pudo conectar con los votos. Reintentando…"); }
 }
 async function vote(i){
-  const next = state.mine===i ? null : i;
-  const prev = state; // optimista: se ve al instante, el servidor confirma
-  const counts = state.counts.slice();
-  if(state.mine!==null) counts[state.mine]--;
-  if(next!==null) counts[next]++;
-  state = {counts, mine:next}; paint();
-  try{ state = await api("POST", {voter, drink:next}); status(""); }
-  catch(e){ state = prev; status("No se pudo guardar tu voto. Probá de nuevo."); }
-  paint();
+  const on = !state.mine.includes(i);
+  const counts = state.counts.slice(); counts[i] += on ? 1 : -1;
+  state = {counts, mine: on ? [...state.mine, i] : state.mine.filter(x=>x!==i)}; paint(); // optimista
+  pending++;
+  try{ const r = await api("POST", {voter, drink:i, on}); if(pending===1) state = r; status(""); }
+  catch(e){ status("No se pudo guardar tu voto. Probá de nuevo."); pending--; await refresh(); return; }
+  pending--; paint();
 }
 paint(); refresh(); setInterval(refresh, 15000);
 </script>
