@@ -118,11 +118,6 @@
   .col .used{ display:block; font-size:.72rem; color:var(--muted); }
   .col .empty{ color:var(--muted); font-size:.9rem; }
   #status{ min-height:1.2em; }
-  .guests{ width:100%; border-collapse:collapse; }
-  .guests td{ padding:8px 6px; border-top:2px dashed var(--line); vertical-align:top; }
-  .guests td:first-child{ font-weight:800; white-space:nowrap; padding-right:14px; }
-  .guests tr.me td:first-child::after{ content:" (vos)"; font-weight:400; color:var(--muted); }
-  .chip{ display:inline-block; background:#fbecd0; border-radius:999px; padding:2px 10px; margin:2px 4px 2px 0; font-size:.9rem; }
   .qty{ display:inline-block; min-width:2.2em; font-weight:800; color:var(--orange); }
   @media print{ .vote{ display:none; } .shop{ border:2px solid var(--line); page-break-after:always; break-after:page; } }
 </style>
@@ -138,12 +133,6 @@
   <h2>Lista de compras</h2>
   <p id="shopNote">Elegí tus tragos y la lista se arma sola con lo que hace falta.</p>
   <div class="cols" id="shop"></div>
-</section>
-
-<section class="shop" aria-label="Invitadas">
-  <h2 id="guestsTitle">Invitadas</h2>
-  <p>Quién eligió qué.</p>
-  <table class="guests"><tbody id="guests"></tbody></table>
 </section>
 
 <main class="grid" id="grid"></main>
@@ -347,7 +336,7 @@ const voter = (()=>{
   if(!id){ id = crypto.randomUUID(); try{ localStorage.setItem("voter", id); }catch(e){} }
   return id;
 })();
-let state = {counts:T.map(()=>0), mine:[], guests:[]};
+let state = {counts:T.map(()=>0), mine:[]};
 let pending = 0; // votos en vuelo: mientras haya, no pisar lo que se ve con respuestas viejas
 const checked = new Set();
 
@@ -365,11 +354,6 @@ function paint(){
   document.getElementById("shopNote").textContent = total
     ? `Armada con ${total} ${total===1?"voto":"votos"}. Tocá cada cosa para tacharla.`
     : "Elegí tus tragos y la lista se arma sola con lo que hace falta.";
-  const gs = state.guests || [];
-  document.getElementById("guestsTitle").textContent = gs.length ? `Invitadas (${gs.length})` : "Invitadas";
-  document.getElementById("guests").innerHTML = gs.length
-    ? gs.map((g,k)=>`<tr${g.me?' class="me"':''}><td>Invitada ${k+1}</td><td>${g.drinks.map(i=>`<span class="chip">${T[i].n}</span>`).join("")}</td></tr>`).join("")
-    : '<tr><td colspan="2" class="empty">Todavía no votó nadie.</td></tr>';
   document.getElementById("shop").innerHTML = SHOP.map(g=>{
     const rows = g.items.map(([k,label,qty])=>{
       const by = T.map((t,i)=>needs[i].has(k)&&state.counts[i]?`${t.n} ×${state.counts[i]}`:null).filter(Boolean);
@@ -398,7 +382,7 @@ async function refresh(){
 async function vote(i){
   const on = !state.mine.includes(i);
   const counts = state.counts.slice(); counts[i] += on ? 1 : -1;
-  state = {...state, counts, mine: on ? [...state.mine, i] : state.mine.filter(x=>x!==i)}; paint(); // optimista
+  state = {counts, mine: on ? [...state.mine, i] : state.mine.filter(x=>x!==i)}; paint(); // optimista
   pending++;
   try{ const r = await api("POST", {voter, drink:i, on}); if(pending===1) state = r; status(""); }
   catch(e){ status("No se pudo guardar tu voto. Probá de nuevo."); pending--; await refresh(); return; }
