@@ -1,6 +1,6 @@
 const { put, list, del } = require("@vercel/blob");
 
-const DRINKS = 14; // debe coincidir con T.length en index.html
+const DRINKS = 16; // debe coincidir con T.length en index.html
 const VOTER = /^[A-Za-z0-9-]{8,64}$/;
 
 // Un blob por (votante, trago): votes/<voter>__<trago>. Votar/desvotar = crear/borrar ese blob,

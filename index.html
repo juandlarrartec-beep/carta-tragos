@@ -142,7 +142,7 @@ const C = {
   vodka:"#dfeff7", gin:"#e6f4f1", "tónica":"#d6ecf5", soda:"#e4f3fa",
   naranja:"#ff9d2f", pomelo:"#ff7a6b", campari:"#d81e3f", "vermú":"#8a2d2d",
   aperol:"#ff6b2f", champagne:"#f3dc78", whisky:"#c87f2a", "limón":"#f4e04d",
-  "almíbar":"#f7efc4", menta:"#3fa34d", lima:"#9bcf3c",
+  "almíbar":"#f7efc4", "cachaça":"#f0e6b8", menta:"#3fa34d", lima:"#9bcf3c",
   "jugo naranja":"#ff9d2f", "jugo pomelo":"#ff7a6b", "jugo limón":"#f4e04d"
 };
 
@@ -174,7 +174,12 @@ const T = [
  {n:"Whisky Sour", g:"rocks", mix:["#e0b24e","#efcf7a"], fr:"limón", ing:["whisky","jugo limón","almíbar"], bub:false,
   st:["whisky","jugo limón","almíbar","batir","colar"]},
  {n:"Mimosa", g:"flute", mix:["#ffb13e","#f6d270"], fr:null, ing:["jugo naranja","champagne"], bub:true,
-  st:["frío","jugo naranja","champagne"]}
+  st:["frío","jugo naranja","champagne"]},
+ // nuevos: van al final, el índice de cada trago es la clave de sus votos en /api/votes
+ {n:"Old Fashioned", g:"rocks", mix:["#b8691f","#d68b3c"], fr:"naranja", ing:["whisky","almíbar","naranja"], bub:false,
+  st:["almíbar","whisky","hielo","revolver","naranja"]},
+ {n:"Caipiriña", g:"rocks", mix:["#d9e8a0","#eef5c8"], fr:"lima", ing:["cachaça","lima","almíbar"], bub:false,
+  st:["lima","almíbar","cachaça","hielo","revolver"]}
 ];
 
 const LABEL = {hielo:"hielo", revolver:"revolver", batir:"batir", colar:"colar", "frío":"copa fría",
@@ -309,7 +314,7 @@ T.forEach((t,ti)=>{
 const SHOP = [
   {cat:"Bebidas", note:"en Maxiconsumo, miércoles con BNA", items:[
     ["vodka","Vodka","1"],["gin","Gin","1"],["campari","Campari","1"],["aperol","Aperol","1"],
-    ["vermú","Vermú","1"],["whisky","Whisky Jack Daniel's","1"],["champagne","Champagne","2"],["soda","Soda","1"]]},
+    ["vermú","Vermú","1"],["whisky","Whisky Jack Daniel's","1"],["cachaça","Cachaça","1"],["champagne","Champagne","2"],["soda","Soda","1"]]},
   {cat:"Jugos y gaseosas", note:"en Maxiconsumo", items:[
     ["jugo naranja","Jugo de naranja","2"],["jugo pomelo","Jugo de pomelo","3"],["tónica","Tónica","2"],["azúcar","Azúcar","1"]]},
   {cat:"Frutas y verdura", note:"en la verdulería", items:[
