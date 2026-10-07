@@ -107,49 +107,33 @@
   .col label{ display:flex; align-items:center; gap:10px; padding:5px 0; cursor:pointer; font-size:1rem; }
   .col input{ width:20px; height:20px; accent-color:var(--orange); flex:none; }
   .col input:checked + span{ text-decoration:line-through; opacity:.5; }
+  .vote{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .vbtn{ font:inherit; font-weight:600; font-size:.95rem; border:2px solid var(--ink); background:transparent; color:var(--ink);
+         border-radius:999px; padding:7px 16px; cursor:pointer; }
+  .vbtn[aria-pressed="true"]{ background:var(--orange); border-color:var(--orange); }
+  .vbtn:focus-visible{ outline:3px solid var(--orange); outline-offset:2px; }
+  .vcount{ font-weight:800; font-size:1.1rem; }
+  .vcount small{ font-weight:400; color:var(--muted); font-size:.8rem; }
+  .card.mine{ outline:4px solid var(--orange); }
+  .col .used{ display:block; font-size:.72rem; color:var(--muted); }
+  .col .empty{ color:var(--muted); font-size:.9rem; }
+  #status{ min-height:1.2em; }
   .qty{ display:inline-block; min-width:2.2em; font-weight:800; color:var(--orange); }
-  @media print{ .shop{ border:2px solid var(--line); page-break-after:always; break-after:page; } }
+  @media print{ .vote{ display:none; } .shop{ border:2px solid var(--line); page-break-after:always; break-after:page; } }
 </style>
 </head>
 <body>
 <header>
   <h1>Carta de tragos</h1>
-  <p>Mirá cómo se arma cada uno, paso por paso.</p>
+  <p>Mirá cómo se arma cada uno, paso por paso. <b>Elegí tu trago</b> y entre todos armamos la compra.</p>
+  <p id="status" role="status"></p>
   <button class="print-btn no-print" onclick="window.print()">Guardar como PDF</button>
 </header>
 
 <section class="shop" aria-label="Lista de compras">
   <h2>Lista de compras</h2>
-  <p>Todo lo que hace falta para los tragos. Tocá cada cosa para tacharla.</p>
-  <div class="cols">
-    <div class="col"><h3>Bebidas<small>en Maxiconsumo, miércoles con BNA</small></h3>
-      <label><input type="checkbox"><span><span class="qty">1</span>Vodka</span></label>
-      <label><input type="checkbox"><span><span class="qty">1</span>Gin</span></label>
-      <label><input type="checkbox"><span><span class="qty">1</span>Campari</span></label>
-      <label><input type="checkbox"><span><span class="qty">1</span>Aperol</span></label>
-      <label><input type="checkbox"><span><span class="qty">1</span>Vermú</span></label>
-      <label><input type="checkbox"><span><span class="qty">1</span>Whisky Jack Daniel's</span></label>
-      <label><input type="checkbox"><span><span class="qty">2</span>Champagne</span></label>
-      <label><input type="checkbox"><span><span class="qty">1</span>Soda</span></label>
-    </div>
-    <div class="col"><h3>Jugos y gaseosas<small>en Maxiconsumo</small></h3>
-      <label><input type="checkbox"><span><span class="qty">2</span>Jugo de naranja</span></label>
-      <label><input type="checkbox"><span><span class="qty">3</span>Jugo de pomelo</span></label>
-      <label><input type="checkbox"><span><span class="qty">2</span>Tónica</span></label>
-      <label><input type="checkbox"><span><span class="qty">1</span>Azúcar</span></label>
-    </div>
-    <div class="col"><h3>Frutas y verdura<small>en la verdulería</small></h3>
-      <label><input type="checkbox"><span><span class="qty"></span>Limas</span></label>
-      <label><input type="checkbox"><span><span class="qty"></span>Limones</span></label>
-      <label><input type="checkbox"><span><span class="qty"></span>Naranjas</span></label>
-      <label><input type="checkbox"><span><span class="qty"></span>Pomelos</span></label>
-      <label><input type="checkbox"><span><span class="qty"></span>Menta</span></label>
-    </div>
-    <div class="col"><h3>Hielo<small>comprarlo el mismo día</small></h3>
-      <label><input type="checkbox"><span><span class="qty">4 kg</span>Hielo en cubos</span></label>
-      <label><input type="checkbox"><span><span class="qty">1 kg</span>Hielo molido</span></label>
-    </div>
-  </div>
+  <p id="shopNote">Elegí tu trago y la lista se arma sola con lo que hace falta.</p>
+  <div class="cols" id="shop"></div>
 </section>
 
 <main class="grid" id="grid"></main>
@@ -294,7 +278,8 @@ function glassSVG(t){
 }
 
 const grid = document.getElementById("grid");
-T.forEach(t=>{
+const cards = [];
+T.forEach((t,ti)=>{
   const n = t.st.length;
   const span = 6/n;
   const ings = t.ing.map(i=>{
@@ -312,11 +297,94 @@ T.forEach(t=>{
   const card = document.createElement("article");
   card.className = "card";
   card.innerHTML = `<h2>${t.n}</h2>
+    <div class="vote"><button class="vbtn" aria-pressed="false">Quiero este</button><span class="vcount">0 <small>votos</small></span></div>
     <div class="stage">${glassSVG(t)}</div>
     <div class="ings">${ings}</div>
     <div class="steps ${n>=5?'s5':'s4'}" ${n===3?'style="grid-template-columns:repeat(3,1fr)"':''}>${steps}</div>`;
   grid.appendChild(card);
+  card.querySelector('.vbtn').onclick = () => vote(ti);
+  cards.push(card);
 });
+
+// ---- votos compartidos (API /api/votes) + lista de compras derivada ----
+const SHOP = [
+  {cat:"Bebidas", note:"en Maxiconsumo, miércoles con BNA", items:[
+    ["vodka","Vodka","1"],["gin","Gin","1"],["campari","Campari","1"],["aperol","Aperol","1"],
+    ["vermú","Vermú","1"],["whisky","Whisky Jack Daniel's","1"],["champagne","Champagne","2"],["soda","Soda","1"]]},
+  {cat:"Jugos y gaseosas", note:"en Maxiconsumo", items:[
+    ["jugo naranja","Jugo de naranja","2"],["jugo pomelo","Jugo de pomelo","3"],["tónica","Tónica","2"],["azúcar","Azúcar","1"]]},
+  {cat:"Frutas y verdura", note:"en la verdulería", items:[
+    ["lima","Limas",""],["limón","Limones",""],["naranja","Naranjas",""],["pomelo","Pomelos",""],["menta","Menta",""]]},
+  {cat:"Hielo", note:"comprarlo el mismo día", items:[
+    ["hielo","Hielo en cubos","4 kg"],["hielo molido","Hielo molido","1 kg"]]}
+];
+const ALIAS = {"jugo limón":"limón", "almíbar":"azúcar"};
+// qué necesita cada trago, derivado de sus datos (ingredientes, adorno y pasos)
+const needs = T.map(t=>{
+  const k = new Set([...t.ing, t.fr].filter(Boolean).map(i=>ALIAS[i]||i));
+  if(t.st.includes("hielo")) k.add("hielo");
+  if(t.st.includes("batir")) k.add("hielo molido");
+  return k;
+});
+
+const voter = (()=>{
+  let id; try{ id = localStorage.getItem("voter"); }catch(e){}
+  if(!id){ id = crypto.randomUUID(); try{ localStorage.setItem("voter", id); }catch(e){} }
+  return id;
+})();
+let state = {counts:T.map(()=>0), mine:null};
+const checked = new Set();
+
+function paint(){
+  cards.forEach((c,i)=>{
+    const n = state.counts[i];
+    c.classList.toggle("mine", state.mine===i);
+    const b = c.querySelector(".vbtn");
+    b.setAttribute("aria-pressed", state.mine===i);
+    b.textContent = state.mine===i ? "Elegido ✓" : "Quiero este";
+    c.querySelector(".vcount").innerHTML = `${n} <small>${n===1?"voto":"votos"}</small>`;
+  });
+  const total = state.counts.reduce((a,b)=>a+b,0);
+  document.getElementById("shopNote").textContent = total
+    ? `Armada con ${total} ${total===1?"voto":"votos"}. Tocá cada cosa para tacharla.`
+    : "Elegí tu trago y la lista se arma sola con lo que hace falta.";
+  document.getElementById("shop").innerHTML = SHOP.map(g=>{
+    const rows = g.items.map(([k,label,qty])=>{
+      const by = T.map((t,i)=>needs[i].has(k)&&state.counts[i]?`${t.n} ×${state.counts[i]}`:null).filter(Boolean);
+      if(!by.length) return "";
+      return `<label><input type="checkbox" data-k="${k}"${checked.has(k)?" checked":""}><span><span class="qty">${qty}</span>${label}<span class="used">${by.join(" · ")}</span></span></label>`;
+    }).join("");
+    return `<div class="col"><h3>${g.cat}<small>${g.note}</small></h3>${rows||'<p class="empty">Nada por ahora</p>'}</div>`;
+  }).join("");
+}
+document.getElementById("shop").addEventListener("change", e=>{
+  const k = e.target.dataset.k; if(!k) return;
+  e.target.checked ? checked.add(k) : checked.delete(k);
+});
+
+const status = msg => document.getElementById("status").textContent = msg;
+async function api(method, body){
+  const r = await fetch(method==="GET" ? `/api/votes?voter=${encodeURIComponent(voter)}` : "/api/votes",
+    {method, headers:{"content-type":"application/json"}, body: body && JSON.stringify(body)});
+  if(!r.ok) throw new Error(r.status);
+  return r.json();
+}
+async function refresh(){
+  try{ state = await api("GET"); status(""); paint(); }
+  catch(e){ status("No se pudo conectar con los votos. Reintentando…"); }
+}
+async function vote(i){
+  const next = state.mine===i ? null : i;
+  const prev = state; // optimista: se ve al instante, el servidor confirma
+  const counts = state.counts.slice();
+  if(state.mine!==null) counts[state.mine]--;
+  if(next!==null) counts[next]++;
+  state = {counts, mine:next}; paint();
+  try{ state = await api("POST", {voter, drink:next}); status(""); }
+  catch(e){ state = prev; status("No se pudo guardar tu voto. Probá de nuevo."); }
+  paint();
+}
+paint(); refresh(); setInterval(refresh, 15000);
 </script>
 </body>
 </html>
