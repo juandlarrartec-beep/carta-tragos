@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carta de tragos ilustrada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wall:#0f3b3a; --wall2:#14504e; --paper:#fff6e5; --ink:#1d2b2a;
+    --muted:#5d6b69; --orange:#ff8a3d; --lime:#9bcf3c; --line:#e8dcc4;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --wall:#0b2e2d; --wall2:#103f3e; }
+  }
+  :root[data-theme="dark"]{ --wall:#0b2e2d; --wall2:#103f3e; }
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+  body{
+    font-family:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+    background:radial-gradient(circle at 20% 0%, var(--wall2), var(--wall) 60%);
+    background-color:var(--wall);
+    color:var(--paper); min-height:100vh; padding:28px 16px 48px;
+  }
+  header{ max-width:1180px; margin:0 auto 28px; text-align:center; }
+  header h1{ font-weight:800; font-size:clamp(2.2rem,6vw,3.6rem); line-height:1; letter-spacing:-.02em; }
+  header p{ margin-top:10px; opacity:.8; font-size:1rem; }
+
+  .grid{ max-width:1180px; margin:0 auto; display:grid; gap:20px;
+         grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); }
+  .card{ background:var(--paper); color:var(--ink); border-radius:22px 22px 6px 22px;
+         padding:18px 16px 16px; display:flex; flex-direction:column; gap:12px;
+         break-inside:avoid; page-break-inside:avoid; }
+  .card h2{ font-weight:800; font-size:1.45rem; text-align:center; letter-spacing:-.01em; }
+
+  .stage{ display:flex; justify-content:center; height:190px; }
+  .stage svg{ height:100%; width:auto; overflow:visible; }
+
+  .ings{ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+  .ing{ display:flex; flex-direction:column; align-items:center; gap:2px; font-size:.78rem; color:var(--muted); }
+  .ing svg{ width:34px; height:46px; }
+
+  .steps{ display:grid; gap:6px; border-top:2px dashed var(--line); padding-top:12px; }
+  .steps.s4{ grid-template-columns:repeat(4,1fr); }
+  .steps.s5{ grid-template-columns:repeat(5,1fr); }
+  .step{ position:relative; display:flex; flex-direction:column; align-items:center;
+         background:#fbecd0; border-radius:14px; padding:8px 2px 6px;
+         animation:glow var(--cycle) infinite; animation-delay:var(--d); }
+  .step b{ position:absolute; top:-8px; left:-4px; width:20px; height:20px; border-radius:50%;
+           background:var(--ink); color:var(--paper); font-size:.72rem; display:grid; place-items:center; }
+  .step svg{ width:44px; height:44px; }
+  .step small{ font-size:.66rem; color:var(--muted); margin-top:2px; text-align:center; line-height:1.1; }
+
+  .card{ --cycle:9s; }
+  @keyframes glow{
+    0%,2%{ background:#fbecd0; transform:none; }
+    5%,16%{ background:#ffd29a; transform:translateY(-4px); }
+    20%,100%{ background:#fbecd0; transform:none; }
+  }
+  .liquid{ transform-box:fill-box; transform-origin:50% 100%; animation:fill var(--cycle) infinite ease-in-out; }
+  @keyframes fill{ 0%,12%{ transform:scaleY(0); } 70%,92%{ transform:scaleY(1); } 100%{ transform:scaleY(0); opacity:.0; } }
+  .ice{ animation:drop var(--cycle) infinite; }
+  @keyframes drop{ 0%{ transform:translateY(-120px); opacity:0; } 6%{ opacity:1; } 12%,92%{ transform:translateY(0); opacity:1; } 100%{ opacity:0; } }
+  .garnish{ transform-box:fill-box; transform-origin:center; animation:pop var(--cycle) infinite; }
+  @keyframes pop{ 0%,72%{ transform:scale(0); } 78%{ transform:scale(1.2); } 82%,92%{ transform:scale(1); } 100%{ transform:scale(0); } }
+  .bub{ animation:rise 2.4s infinite linear; opacity:0; }
+  @keyframes rise{ 0%{ transform:translateY(0); opacity:0; } 20%{ opacity:.8; } 100%{ transform:translateY(-70px); opacity:0; } }
+  .bubbles{ animation:showb var(--cycle) infinite; }
+  @keyframes showb{ 0%,55%{ opacity:0; } 65%,92%{ opacity:1; } 100%{ opacity:0; } }
+  .shake{ transform-box:fill-box; transform-origin:center; animation:shake 1s infinite ease-in-out; }
+  @keyframes shake{ 0%,100%{ transform:rotate(-12deg); } 50%{ transform:rotate(12deg); } }
+  .stir{ transform-box:fill-box; transform-origin:50% 90%; animation:stir 1.4s infinite ease-in-out; }
+  @keyframes stir{ 0%,100%{ transform:rotate(-14deg); } 50%{ transform:rotate(14deg); } }
+  .pourdrop{ animation:pd 1s infinite linear; }
+  @keyframes pd{ 0%{ transform:translateY(0); opacity:1; } 100%{ transform:translateY(12px); opacity:0; } }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; }
+  }
+
+  @media print{
+    @page{ margin:12mm; }
+    body{ background:#fff !important; color:var(--ink); padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    header{ color:var(--ink); }
+    .grid{ grid-template-columns:repeat(2,1fr); gap:12px; }
+    .card{ border:2px solid var(--line); }
+    *{ animation:none !important; }
+    .bubbles{ opacity:1; }
+    .no-print{ display:none; }
+  }
+  .print-btn{ display:block; margin:16px auto 0; font:inherit; font-weight:600; font-size:1rem;
+    background:var(--orange); color:var(--ink); border:0; border-radius:999px; padding:10px 22px; cursor:pointer; }
+  .print-btn:focus-visible{ outline:3px solid var(--paper); outline-offset:3px; }
+
+  .shop{ max-width:1180px; margin:0 auto 28px; background:var(--paper); color:var(--ink);
+         border-radius:22px 22px 6px 22px; padding:22px 20px; }
+  .shop h2{ font-weight:800; font-size:1.7rem; margin-bottom:4px; }
+  .shop > p{ color:var(--muted); margin-bottom:16px; }
+  .cols{ display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+  .col h3{ font-size:1.1rem; font-weight:800; padding-bottom:6px; border-bottom:2px dashed var(--line); margin-bottom:8px; }
+  .col h3 small{ font-weight:400; color:var(--muted); font-size:.82rem; display:block; }
+  .col label{ display:flex; align-items:center; gap:10px; padding:5px 0; cursor:pointer; font-size:1rem; }
+  .col input{ width:20px; height:20px; accent-color:var(--orange); flex:none; }
+  .col input:checked + span{ text-decoration:line-through; opacity:.5; }
+  .qty{ display:inline-block; min-width:2.2em; font-weight:800; color:var(--orange); }
+  @media print{ .shop{ border:2px solid var(--line); page-break-after:always; break-after:page; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Carta de tragos</h1>
+  <p>Mirá cómo se arma cada uno, paso por paso.</p>
+  <button class="print-btn no-print" onclick="window.print()">Guardar como PDF</button>
+</header>
+
+<section class="shop" aria-label="Lista de compras">
+  <h2>Lista de compras</h2>
+  <p>Todo lo que hace falta para los tragos. Tocá cada cosa para tacharla.</p>
+  <div class="cols">
+    <div class="col"><h3>Bebidas<small>en Maxiconsumo, miércoles con BNA</small></h3>
+      <label><input type="checkbox"><span><span class="qty">1</span>Vodka</span></label>
+      <label><input type="checkbox"><span><span class="qty">1</span>Gin</span></label>
+      <label><input type="checkbox"><span><span class="qty">1</span>Campari</span></label>
+      <label><input type="checkbox"><span><span class="qty">1</span>Aperol</span></label>
+      <label><input type="checkbox"><span><span class="qty">1</span>Vermú</span></label>
+      <label><input type="checkbox"><span><span class="qty">1</span>Whisky Jack Daniel's</span></label>
+      <label><input type="checkbox"><span><span class="qty">2</span>Champagne</span></label>
+      <label><input type="checkbox"><span><span class="qty">1</span>Soda</span></label>
+    </div>
+    <div class="col"><h3>Jugos y gaseosas<small>en Maxiconsumo</small></h3>
+      <label><input type="checkbox"><span><span class="qty">2</span>Jugo de naranja</span></label>
+      <label><input type="checkbox"><span><span class="qty">3</span>Jugo de pomelo</span></label>
+      <label><input type="checkbox"><span><span class="qty">2</span>Tónica</span></label>
+      <label><input type="checkbox"><span><span class="qty">1</span>Azúcar</span></label>
+    </div>
+    <div class="col"><h3>Frutas y verdura<small>en la verdulería</small></h3>
+      <label><input type="checkbox"><span><span class="qty"></span>Limas</span></label>
+      <label><input type="checkbox"><span><span class="qty"></span>Limones</span></label>
+      <label><input type="checkbox"><span><span class="qty"></span>Naranjas</span></label>
+      <label><input type="checkbox"><span><span class="qty"></span>Pomelos</span></label>
+      <label><input type="checkbox"><span><span class="qty"></span>Menta</span></label>
+    </div>
+    <div class="col"><h3>Hielo<small>comprarlo el mismo día</small></h3>
+      <label><input type="checkbox"><span><span class="qty">4 kg</span>Hielo en cubos</span></label>
+      <label><input type="checkbox"><span><span class="qty">1 kg</span>Hielo molido</span></label>
+    </div>
+  </div>
+</section>
+
+<main class="grid" id="grid"></main>
+
+<script>
+const C = {
+  vodka:"#dfeff7", gin:"#e6f4f1", "tónica":"#d6ecf5", soda:"#e4f3fa",
+  naranja:"#ff9d2f", pomelo:"#ff7a6b", campari:"#d81e3f", "vermú":"#8a2d2d",
+  aperol:"#ff6b2f", champagne:"#f3dc78", whisky:"#c87f2a", "limón":"#f4e04d",
+  "almíbar":"#f7efc4", menta:"#3fa34d", lima:"#9bcf3c",
+  "jugo naranja":"#ff9d2f", "jugo pomelo":"#ff7a6b", "jugo limón":"#f4e04d"
+};
+
+const T = [
+ {n:"Destornillador", g:"high", mix:["#ff9d2f","#ffb35c"], fr:"naranja", ing:["vodka","jugo naranja"], bub:false,
+  st:["hielo","vodka","jugo naranja","revolver"]},
+ {n:"Vodka Tonic", g:"high", mix:["#d6ecf5","#eaf6fb"], fr:"lima", ing:["vodka","tónica","lima"], bub:true,
+  st:["hielo","vodka","tónica","lima"]},
+ {n:"Greyhound", g:"high", mix:["#ff7a6b","#ff9b8c"], fr:"pomelo", ing:["vodka","jugo pomelo"], bub:false,
+  st:["hielo","vodka","jugo pomelo","revolver"]},
+ {n:"Gin Tonic", g:"copa", mix:["#d6ecf5","#eef8fb"], fr:"limón", ing:["gin","tónica","limón"], bub:true,
+  st:["hielo","gin","tónica","limón"]},
+ {n:"Gin Pomelo", g:"high", mix:["#ff8f7d","#ffb0a2"], fr:"menta", ing:["gin","jugo pomelo","menta"], bub:false,
+  st:["menta","hielo","gin","jugo pomelo"]},
+ {n:"Aperol Spritz", g:"copa", mix:["#ff6b2f","#ff9a4a"], fr:"naranja", ing:["champagne","aperol","soda","naranja"], bub:true,
+  st:["hielo","champagne","aperol","soda","naranja"]},
+ {n:"Campari Tonic", g:"high", mix:["#d81e3f","#ec4a62"], fr:"naranja", ing:["campari","tónica","naranja"], bub:true,
+  st:["hielo","campari","tónica","naranja"]},
+ {n:"Negroni", g:"rocks", mix:["#9e1c26","#c0303a"], fr:"naranja", ing:["gin","campari","vermú","naranja"], bub:false,
+  st:["hielo","gin","campari","vermú","revolver"]},
+ {n:"Vermú con Soda", g:"rocks", mix:["#8a2d2d","#a8463e"], fr:"naranja", ing:["vermú","soda","naranja"], bub:true,
+  st:["hielo","vermú","soda","naranja"]},
+ {n:"Americano", g:"high", mix:["#a8302c","#c9483c"], fr:"naranja", ing:["vermú","campari","soda"], bub:true,
+  st:["hielo","vermú","campari","soda"]},
+ {n:"Whisky & Soda", g:"rocks", mix:["#c87f2a","#dca35a"], fr:null, ing:["whisky","soda"], bub:true,
+  st:["hielo","whisky","soda","revolver"]},
+ {n:"Jack con Jugo", g:"high", mix:["#e0912e","#f0ad4e"], fr:"naranja", ing:["whisky","jugo naranja"], bub:false,
+  st:["hielo","whisky","jugo naranja","revolver"]},
+ {n:"Whisky Sour", g:"rocks", mix:["#e0b24e","#efcf7a"], fr:"limón", ing:["whisky","jugo limón","almíbar"], bub:false,
+  st:["whisky","jugo limón","almíbar","batir","colar"]},
+ {n:"Mimosa", g:"flute", mix:["#ffb13e","#f6d270"], fr:null, ing:["jugo naranja","champagne"], bub:true,
+  st:["frío","jugo naranja","champagne"]}
+];
+
+const LABEL = {hielo:"hielo", revolver:"revolver", batir:"batir", colar:"colar", "frío":"copa fría",
+  naranja:"rodaja de naranja", "limón":"rodaja de limón", lima:"rodaja de lima", menta:"menta",
+  "jugo naranja":"jugo de naranja", "jugo pomelo":"jugo de pomelo", "jugo limón":"jugo de limón"};
+const FRUIT = ["naranja","limón","lima"];
+
+let uid = 0;
+
+function bottle(color, w=34, h=46){
+  return `<svg viewBox="0 0 34 46" width="${w}" height="${h}" aria-hidden="true">
+    <rect x="13" y="2" width="8" height="10" rx="2" fill="#5b4636"/>
+    <path d="M11 12 h12 v6 q6 3 6 10 v14 q0 3 -3 3 h-18 q-3 0 -3 -3 v-14 q0 -7 6 -10z" fill="${color}" stroke="#1d2b2a" stroke-width="1.6"/>
+    <rect x="9" y="26" width="16" height="9" rx="2" fill="#fff" opacity=".75"/>
+  </svg>`;
+}
+function fruitSlice(color, size=44){
+  return `<svg viewBox="0 0 44 44" width="${size}" height="${size}" aria-hidden="true">
+    <circle cx="22" cy="22" r="18" fill="${color}" stroke="#1d2b2a" stroke-width="1.6"/>
+    <circle cx="22" cy="22" r="14" fill="#fff8d8" opacity=".55"/>
+    ${[0,45,90,135].map(a=>`<line x1="22" y1="22" x2="${22+14*Math.cos(a*Math.PI/180)}" y2="${22+14*Math.sin(a*Math.PI/180)}" stroke="${color}" stroke-width="2"/><line x1="22" y1="22" x2="${22-14*Math.cos(a*Math.PI/180)}" y2="${22-14*Math.sin(a*Math.PI/180)}" stroke="${color}" stroke-width="2"/>`).join("")}
+  </svg>`;
+}
+function mintIcon(size=44){
+  return `<svg viewBox="0 0 44 44" width="${size}" height="${size}" aria-hidden="true">
+    <path d="M22 38 Q8 26 14 10 Q24 14 22 38z" fill="#3fa34d" stroke="#1d2b2a" stroke-width="1.5"/>
+    <path d="M22 38 Q36 26 30 10 Q20 14 22 38z" fill="#5cbf68" stroke="#1d2b2a" stroke-width="1.5"/>
+    <line x1="22" y1="38" x2="22" y2="16" stroke="#1d2b2a" stroke-width="1.2"/>
+  </svg>`;
+}
+function stepIcon(s){
+  if(s==="hielo") return `<svg viewBox="0 0 44 44"><rect x="6" y="14" width="16" height="16" rx="3" fill="#cfeefc" stroke="#1d2b2a" stroke-width="1.5" transform="rotate(-10 14 22)"/><rect x="20" y="8" width="16" height="16" rx="3" fill="#e4f6ff" stroke="#1d2b2a" stroke-width="1.5" transform="rotate(12 28 16)"/><rect x="18" y="24" width="16" height="16" rx="3" fill="#bfe6f8" stroke="#1d2b2a" stroke-width="1.5"/></svg>`;
+  if(s==="revolver") return `<svg viewBox="0 0 44 44"><path d="M8 18 h28 l-3 22 h-22z" fill="#e9f5fa" stroke="#1d2b2a" stroke-width="1.5"/><g class="stir"><line x1="22" y1="4" x2="22" y2="36" stroke="#8a8f94" stroke-width="3" stroke-linecap="round"/><circle cx="22" cy="36" r="3" fill="#8a8f94"/></g></svg>`;
+  if(s==="batir") return `<svg viewBox="0 0 44 44"><g class="shake"><rect x="14" y="4" width="16" height="6" rx="2" fill="#9aa3a8" stroke="#1d2b2a" stroke-width="1.4"/><path d="M12 10 h20 l-3 30 h-14z" fill="#c4ccd1" stroke="#1d2b2a" stroke-width="1.5"/></g></svg>`;
+  if(s==="colar") return `<svg viewBox="0 0 44 44"><circle cx="18" cy="14" r="10" fill="#c4ccd1" stroke="#1d2b2a" stroke-width="1.5"/>${[0,1,2].map(i=>`<circle cx="${14+i*4}" cy="14" r="1.2" fill="#1d2b2a"/>`).join("")}<line x1="27" y1="10" x2="40" y2="4" stroke="#1d2b2a" stroke-width="2.5" stroke-linecap="round"/><circle class="pourdrop" cx="18" cy="28" r="2.5" fill="#e0b24e"/><path d="M10 34 h16 l-2 8 h-12z" fill="#efcf7a" stroke="#1d2b2a" stroke-width="1.3"/></svg>`;
+  if(s==="frío") return `<svg viewBox="0 0 44 44">${[0,60,120].map(a=>`<line x1="${22-16*Math.cos(a*Math.PI/180)}" y1="${22-16*Math.sin(a*Math.PI/180)}" x2="${22+16*Math.cos(a*Math.PI/180)}" y2="${22+16*Math.sin(a*Math.PI/180)}" stroke="#4aa8d8" stroke-width="3" stroke-linecap="round"/>`).join("")}<circle cx="22" cy="22" r="4" fill="#cfeefc" stroke="#4aa8d8" stroke-width="2"/></svg>`;
+  if(s==="menta") return mintIcon();
+  const col = C[s] || "#ccc";
+  return `<svg viewBox="0 0 44 44"><g transform="rotate(-50 22 22) translate(6 0) scale(.75)">
+    <rect x="13" y="2" width="8" height="10" rx="2" fill="#5b4636"/>
+    <path d="M11 12 h12 v6 q6 3 6 10 v14 q0 3 -3 3 h-18 q-3 0 -3 -3 v-14 q0 -7 6 -10z" fill="${col}" stroke="#1d2b2a" stroke-width="2"/></g>
+    <circle class="pourdrop" cx="9" cy="30" r="2.6" fill="${col}" stroke="#1d2b2a" stroke-width=".8"/>
+    <circle class="pourdrop" cx="9" cy="36" r="2" fill="${col}" stroke="#1d2b2a" stroke-width=".8" style="animation-delay:.5s"/></svg>`;
+}
+function garnishStep(s){ return FRUIT.includes(s); }
+
+function glassSVG(t){
+  const id = "g"+(uid++);
+  let inner, liquidBox, rimX, rimY, extra="";
+  if(t.g==="high"){
+    inner = `M38 34 L42 166 Q42 172 48 172 L92 172 Q98 172 98 166 L102 34 Z`;
+    liquidBox={x:30,y:52,w:80,h:122}; rimX=100; rimY=34;
+  } else if(t.g==="rocks"){
+    inner = `M28 88 L32 166 Q32 172 38 172 L102 172 Q108 172 108 166 L112 88 Z`;
+    liquidBox={x:24,y:98,w:92,h:76}; rimX=110; rimY=88;
+  } else if(t.g==="copa"){
+    inner = `M24 40 Q22 118 70 124 Q118 118 116 40 Z`;
+    liquidBox={x:20,y:58,w:100,h:68}; rimX=114; rimY=42;
+    extra = `<line x1="70" y1="124" x2="70" y2="166" stroke="#1d2b2a" stroke-width="3"/><ellipse cx="70" cy="170" rx="28" ry="5" fill="#f1e6cf" stroke="#1d2b2a" stroke-width="2.5"/>`;
+  } else {
+    inner = `M50 22 Q46 104 70 116 Q94 104 90 22 Z`;
+    liquidBox={x:44,y:36,w:52,h:82}; rimX=90; rimY=24;
+    extra = `<line x1="70" y1="116" x2="70" y2="164" stroke="#1d2b2a" stroke-width="3"/><ellipse cx="70" cy="168" rx="22" ry="5" fill="#f1e6cf" stroke="#1d2b2a" stroke-width="2.5"/>`;
+  }
+  const iceY = liquidBox.y + 8;
+  const ice = t.g!=="flute" ? `<g class="ice">
+      <rect x="${70-26}" y="${iceY}" width="22" height="22" rx="4" fill="#ffffff" opacity=".7" stroke="#9fd3ea" stroke-width="1.5" transform="rotate(-12 ${70-15} ${iceY+11})"/>
+      <rect x="${70+2}" y="${iceY+6}" width="22" height="22" rx="4" fill="#ffffff" opacity=".7" stroke="#9fd3ea" stroke-width="1.5" transform="rotate(14 ${70+13} ${iceY+17})"/>
+      <rect x="${70-10}" y="${iceY+26}" width="20" height="20" rx="4" fill="#ffffff" opacity=".6" stroke="#9fd3ea" stroke-width="1.5"/>
+    </g>` : "";
+  const bubbles = t.bub ? `<g class="bubbles">${[0,1,2,3,4,5].map(i=>{
+      const bx = liquidBox.x + 14 + (i*13)%(liquidBox.w-24);
+      const by = liquidBox.y + liquidBox.h - 8;
+      return `<circle class="bub" cx="${bx}" cy="${by}" r="${1.6+(i%3)}" fill="#fff" style="animation-delay:${i*0.4}s"/>`;}).join("")}</g>` : "";
+  let garnish = "";
+  if(t.fr==="menta"){
+    garnish = `<g class="garnish"><path d="M${rimX-12} ${rimY-2} Q${rimX-24} ${rimY-16} ${rimX-16} ${rimY-30} Q${rimX-6} ${rimY-20} ${rimX-12} ${rimY-2}z" fill="#3fa34d" stroke="#1d2b2a" stroke-width="1.5"/><path d="M${rimX-12} ${rimY-2} Q${rimX} ${rimY-14} ${rimX+2} ${rimY-28} Q${rimX-10} ${rimY-22} ${rimX-12} ${rimY-2}z" fill="#5cbf68" stroke="#1d2b2a" stroke-width="1.5"/></g>`;
+  } else if(t.fr){
+    const fc = C[t.fr] || "#ff9d2f";
+    garnish = `<g class="garnish"><circle cx="${rimX}" cy="${rimY}" r="16" fill="${fc}" stroke="#1d2b2a" stroke-width="2"/><circle cx="${rimX}" cy="${rimY}" r="12" fill="#fff8d8" opacity=".55"/>${[0,60,120].map(a=>`<line x1="${rimX-12*Math.cos(a*Math.PI/180)}" y1="${rimY-12*Math.sin(a*Math.PI/180)}" x2="${rimX+12*Math.cos(a*Math.PI/180)}" y2="${rimY+12*Math.sin(a*Math.PI/180)}" stroke="${fc}" stroke-width="2"/>`).join("")}</g>`;
+  }
+  return `<svg viewBox="0 -10 150 190" role="img" aria-label="${t.n}">
+    <defs>
+      <clipPath id="c${id}"><path d="${inner}"/></clipPath>
+      <linearGradient id="l${id}" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="${t.mix[0]}"/><stop offset="1" stop-color="${t.mix[1]}"/>
+      </linearGradient>
+    </defs>
+    ${extra}
+    <path d="${inner}" fill="#eef7fb" opacity=".55"/>
+    <g clip-path="url(#c${id})">
+      <rect class="liquid" x="${liquidBox.x}" y="${liquidBox.y}" width="${liquidBox.w}" height="${liquidBox.h}" fill="url(#l${id})"/>
+      ${ice}
+      ${bubbles}
+    </g>
+    <path d="${inner}" fill="none" stroke="#1d2b2a" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M${liquidBox.x+16} ${liquidBox.y+6} l2 ${liquidBox.h*0.6}" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+    ${garnish}
+  </svg>`;
+}
+
+const grid = document.getElementById("grid");
+T.forEach(t=>{
+  const n = t.st.length;
+  const span = 6/n;
+  const ings = t.ing.map(i=>{
+    let icon;
+    if(i==="menta") icon = mintIcon(40);
+    else if(FRUIT.includes(i)) icon = fruitSlice(C[i], 40);
+    else icon = bottle(C[i] || "#ccc");
+    return `<div class="ing">${icon}<span>${LABEL[i] || i}</span></div>`;
+  }).join("");
+  const steps = t.st.map((s,k)=>{
+    const icon = garnishStep(s) ? fruitSlice(C[s]) : stepIcon(s);
+    const label = LABEL[s] || s;
+    return `<div class="step" style="--d:${(k*span).toFixed(2)}s"><b>${k+1}</b>${icon}<small>${label}</small></div>`;
+  }).join("");
+  const card = document.createElement("article");
+  card.className = "card";
+  card.innerHTML = `<h2>${t.n}</h2>
+    <div class="stage">${glassSVG(t)}</div>
+    <div class="ings">${ings}</div>
+    <div class="steps ${n>=5?'s5':'s4'}" ${n===3?'style="grid-template-columns:repeat(3,1fr)"':''}>${steps}</div>`;
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>
